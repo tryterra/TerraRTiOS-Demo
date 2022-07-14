@@ -11,6 +11,8 @@
 		9B4D7E8428804D71001EA126 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4D7E8328804D71001EA126 /* ContentView.swift */; };
 		9B4D7E8628804D73001EA126 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B4D7E8528804D73001EA126 /* Assets.xcassets */; };
 		9B4D7E8928804D73001EA126 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B4D7E8828804D73001EA126 /* Preview Assets.xcassets */; };
+		9B4D7E9128804DB5001EA126 /* TerraRTiOS in Frameworks */ = {isa = PBXBuildFile; productRef = 9B4D7E9028804DB5001EA126 /* TerraRTiOS */; };
+		9B4D7E9328804DDC001EA126 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4D7E9228804DDC001EA126 /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,7 @@
 		9B4D7E8328804D71001EA126 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9B4D7E8528804D73001EA126 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9B4D7E8828804D73001EA126 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		9B4D7E9228804DDC001EA126 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -26,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B4D7E9128804DB5001EA126 /* TerraRTiOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +59,7 @@
 				9B4D7E8328804D71001EA126 /* ContentView.swift */,
 				9B4D7E8528804D73001EA126 /* Assets.xcassets */,
 				9B4D7E8728804D73001EA126 /* Preview Content */,
+				9B4D7E9228804DDC001EA126 /* Config.swift */,
 			);
 			path = TerraRTiOSDemo;
 			sourceTree = "<group>";
@@ -83,6 +88,9 @@
 			dependencies = (
 			);
 			name = TerraRTiOSDemo;
+			packageProductDependencies = (
+				9B4D7E9028804DB5001EA126 /* TerraRTiOS */,
+			);
 			productName = TerraRTiOSDemo;
 			productReference = 9B4D7E7E28804D71001EA126 /* TerraRTiOSDemo.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +119,9 @@
 				Base,
 			);
 			mainGroup = 9B4D7E7528804D71001EA126;
+			packageReferences = (
+				9B4D7E8F28804DB5001EA126 /* XCRemoteSwiftPackageReference "TerraRTiOS" */,
+			);
 			productRefGroup = 9B4D7E7F28804D71001EA126 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -139,6 +150,7 @@
 			files = (
 				9B4D7E8428804D71001EA126 /* ContentView.swift in Sources */,
 				9B4D7E8228804D71001EA126 /* TerraRTiOSDemoApp.swift in Sources */,
+				9B4D7E9328804DDC001EA126 /* Config.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,6 +282,8 @@
 				DEVELOPMENT_TEAM = 8HP4B6QYR7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Provide user with ability to connect to BLE devices";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Provide access to Gyroscope and Accelerometer data";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -299,6 +313,8 @@
 				DEVELOPMENT_TEAM = 8HP4B6QYR7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Provide user with ability to connect to BLE devices";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Provide access to Gyroscope and Accelerometer data";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -339,6 +355,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9B4D7E8F28804DB5001EA126 /* XCRemoteSwiftPackageReference "TerraRTiOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tryterra/TerraRTiOS";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9B4D7E9028804DB5001EA126 /* TerraRTiOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B4D7E8F28804DB5001EA126 /* XCRemoteSwiftPackageReference "TerraRTiOS" */;
+			productName = TerraRTiOS;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9B4D7E7628804D71001EA126 /* Project object */;
 }
