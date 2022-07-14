@@ -36,7 +36,7 @@ extension Color {
 
 struct ContentView: View {
     
-    let terraRT = TerraRT(devId: DEVID, xAPIKey: XAPIKEY, userId: "f0080029-ea31-4448-8b1e-b788c62cbf1f")
+    let terraRT = TerraRT(devId: DEVID, xAPIKey: XAPIKEY, userId: USERID)
     init(){
         terraRT.initConnection(type: .BLE)
         UINavigationBar.appearance().largeTitleTextAttributes = [.font: UIFont.systemFont(ofSize: 24)]
