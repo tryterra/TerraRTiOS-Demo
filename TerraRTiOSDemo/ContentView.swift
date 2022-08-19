@@ -9,6 +9,46 @@ import SwiftUI
 import CoreBluetooth
 import TerraRTiOS
 
+public struct TokenPayload: Decodable{
+    let token: String
+}
+
+public func generateToken(devId: String, xAPIKey: String, userId: String) -> TokenPayload?{
+    
+        let url = URL(string: "https://ws.tryterra.co/auth/user?id=\(userId)")
+        
+        guard let requestUrl = url else {fatalError()}
+        var request = URLRequest(url: requestUrl)
+        var result: TokenPayload? = nil
+        let group = DispatchGroup()
+        let queue = DispatchQueue(label: "terra.token.generation")
+        request.httpMethod = "POST"
+        request.setValue("*/*", forHTTPHeaderField: "Accept")
+        request.setValue("keep-alive", forHTTPHeaderField: "Connection")
+        request.setValue(devId, forHTTPHeaderField: "dev-id")
+        request.setValue(xAPIKey, forHTTPHeaderField: "X-API-Key")
+        
+        let task = URLSession.shared.dataTask(with: request){(data, response, error) in
+            if let data = data{
+                let decoder = JSONDecoder()
+                do{
+                    result = try decoder.decode(TokenPayload.self, from: data)
+                    group.leave()
+                }
+                catch{
+                    print(error)
+                    group.leave()
+                }
+            }
+        }
+        group.enter()
+        queue.async(group: group) {
+            task.resume()
+        }
+        group.wait()
+        return result
+}
+
 struct Globals {
     static var shared = Globals()
     var shownDevices: [Device] = []
@@ -36,7 +76,7 @@ extension Color {
 
 struct ContentView: View {
     
-    let terraRT = TerraRT(devId: DEVID, xAPIKey: XAPIKEY, userId: USERID)
+    let terraRT = TerraRT()
     init(){
         terraRT.initConnection(type: .BLE)
         UINavigationBar.appearance().largeTitleTextAttributes = [.font: UIFont.systemFont(ofSize: 24)]
@@ -91,7 +131,7 @@ struct ContentView: View {
                     .padding([.leading, .trailing])
             }).onChange(of: sensorSwitch){sensorSwitch in
                 if (sensorSwitch){
-                    terraRT.startRealtime(type: .APPLE, dataType: Set([.GYROSCOPE, .ACCELERATION]))
+                    terraRT.startRealtime(type: .APPLE, token:generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId:USERID )!.token, dataType: Set([.GYROSCOPE, .ACCELERATION]))
                 }
                 else {
                     terraRT.stopRealtime(type: .APPLE)
@@ -116,8 +156,9 @@ struct ContentView: View {
                             .foregroundColor(.button)
                     )
             })
-            .sheet(isPresented: $showingWidget){ terraRT.startBluetoothScan(type: .BLE, callback: {_ in
+            .sheet(isPresented: $showingWidget){ terraRT.startBluetoothScan(type: .BLE, callback: {success in
                 showingWidget.toggle()
+                print(success)
             })}
             Toggle(isOn: $bleSwitch, label: {
                 Text("Real Time").fontWeight(.bold)
@@ -127,7 +168,7 @@ struct ContentView: View {
                     .padding([.trailing])
             }).onChange(of: bleSwitch){bleSwitch in
                 if (bleSwitch){
-                    terraRT.startRealtime(type: .BLE, dataType: Set([.STEPS, .HEART_RATE]))
+                    terraRT.startRealtime(type: .BLE, token:generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId:USERID )!.token, dataType: Set([.STEPS, .HEART_RATE]))
                 }
                 else {
                     terraRT.stopRealtime(type: .BLE)
