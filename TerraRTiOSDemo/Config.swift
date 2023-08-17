@@ -7,6 +7,6 @@
 
 import Foundation
 
-let DEVID = "DEV ID"
-let XAPIKEY = "X API KEY"
-let USERID = "USER ID"
+let DEVID = "testingJeffrey"
+let XAPIKEY = "RDBIv0Ir6taL5tqyMkxAn7AjIxXufsq57SX7jEAb"
+let USERID = "watchOSTest"

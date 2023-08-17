@@ -49,6 +49,42 @@ public func generateToken(devId: String, xAPIKey: String, userId: String) -> Tok
         return result
 }
 
+public func generateSDKToken(devId: String, xAPIKey: String) -> TokenPayload?{
+    
+        let url = URL(string: "https://api.tryterra.co/v2/auth/generateAuthToken")
+        
+        guard let requestUrl = url else {fatalError()}
+        var request = URLRequest(url: requestUrl)
+        var result: TokenPayload? = nil
+        let group = DispatchGroup()
+        let queue = DispatchQueue(label: "terra.token.generation")
+        request.httpMethod = "POST"
+        request.setValue("*/*", forHTTPHeaderField: "Accept")
+        request.setValue("keep-alive", forHTTPHeaderField: "Connection")
+        request.setValue(devId, forHTTPHeaderField: "dev-id")
+        request.setValue(xAPIKey, forHTTPHeaderField: "x-api-key")
+        
+        let task = URLSession.shared.dataTask(with: request){(data, response, error) in
+            if let data = data{
+                let decoder = JSONDecoder()
+                do{
+                    result = try decoder.decode(TokenPayload.self, from: data)
+                    group.leave()
+                }
+                catch{
+                    print(error)
+                    group.leave()
+                }
+            }
+        }
+        group.enter()
+        queue.async(group: group) {
+            task.resume()
+        }
+        group.wait()
+        return result
+}
+
 struct Globals {
     static var shared = Globals()
     var shownDevices: [Device] = []
@@ -76,9 +112,22 @@ extension Color {
 
 struct ContentView: View {
     
-    let terraRT = TerraRT()
+    let terraRT = TerraRT(devId: DEVID, referenceId: "user2") { succ in
+        print("TerraRT init: \(succ)")
+    }
+        
     init(){
-        terraRT.initConnection(type: .BLE)
+        print("Hello World")
+        let userId = terraRT.getUserid()
+        print("UserId detected: \(userId ?? "None")")
+        let tokenPayload = generateSDKToken(devId: DEVID, xAPIKey: XAPIKEY)
+        print("TerraSDK token: \(tokenPayload!.token)")
+        terraRT.initConnection(token: tokenPayload!.token) { succ in
+            print("Connection formed: \(succ)")
+//            let newUserId = terraRT.getUserid()
+//            print("UserId: \(newUserId ?? "None")")
+        }
+        
         UINavigationBar.appearance().largeTitleTextAttributes = [.font: UIFont.systemFont(ofSize: 24)]
     }
     
@@ -101,6 +150,18 @@ struct ContentView: View {
                             .stroke(Color.border, lineWidth: 1)
                             .padding([.leading, .trailing], 5)
                         )
+                disconnect().padding([.leading, .trailing, .top, .bottom])
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Globals.shared.cornerradius)
+                            .stroke(Color.border, lineWidth: 1)
+                            .padding([.leading, .trailing], 5)
+                        )
+                watchConnection().padding([.leading, .trailing, .top, .bottom])
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Globals.shared.cornerradius)
+                            .stroke(Color.border, lineWidth: 1)
+                            .padding([.leading, .trailing], 5)
+                        )
                 Spacer()
             }
             .navigationTitle(Text("Terra RealTime iOS")).padding(.top, 40)
@@ -110,7 +171,9 @@ struct ContentView: View {
     private func appleConnection() -> some View {
         HStack{
             Button(action: {
-                terraRT.initConnection(type: .APPLE)
+                print("Sensors selected!")
+//                print("Disconnecting device!")
+//                terraRT.disconnect(type: .BLE)
             }, label: {
                 Text("Sensors")
                 .fontWeight(.bold)
@@ -131,7 +194,57 @@ struct ContentView: View {
                     .padding([.leading, .trailing])
             }).onChange(of: sensorSwitch){sensorSwitch in
                 if (sensorSwitch){
-                    terraRT.startRealtime(type: .APPLE, token:generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId:USERID )!.token, dataType: Set([.GYROSCOPE, .ACCELERATION]))
+                    print("startRealtime - Apple")
+                    let device = terraRT.getConnectedDevice()
+                    if device != nil {
+                        print("getConnectedDevice: \(device!.id), \(device!.deviceName)")
+                    } else {
+                        print("getConnectedDevice: none found")
+                    }
+                    
+//                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .ACCELERATION, .CALORIES, .HRV])) { update in
+//                        print(update)
+//                    }
+                }
+                else {
+                    terraRT.stopRealtime(type: .APPLE)
+                }
+            }
+        }
+    }
+    
+    private func disconnect() -> some View {
+        HStack{
+            Button(action: {
+                print("Disconnecting device!")
+                terraRT.disconnect(type: .BLE)
+            }, label: {
+                Text("Disconnect")
+                    .fontWeight(.bold)
+                    .font(.system(size: 14))
+                    .foregroundColor(.inverse)
+                    .padding([.top, .bottom], Globals.shared.smallpadding)
+                    .padding([.leading, .trailing])
+                    .background(
+                        Capsule()
+                            .foregroundColor(.button)
+                    )
+            })
+            Toggle(isOn: $sensorSwitch, label: {
+                Text("Real Time").fontWeight(.bold)
+                    .font(.system(size: 14))
+                    .foregroundColor(.inverse)
+                    .padding([.top, .bottom], Globals.shared.smallpadding)
+                    .padding([.leading, .trailing])
+            }).onChange(of: sensorSwitch){sensorSwitch in
+                if (sensorSwitch){
+                    print("startRealtime - Apple")
+                    let device = terraRT.getConnectedDevice()
+                    if device != nil {
+                        print("getConnectedDevice: \(device!.id), \(device!.deviceName)")
+                    } else {
+                        print("getConnectedDevice: none found")
+                    }
                 }
                 else {
                     terraRT.stopRealtime(type: .APPLE)
@@ -143,6 +256,7 @@ struct ContentView: View {
     private func connection() -> some View{
         HStack{
             Button(action: {
+                print("BLE selected!")
                 showingWidget.toggle()
             }, label: {
                     Text("BLE")
@@ -158,7 +272,7 @@ struct ContentView: View {
             })
             .sheet(isPresented: $showingWidget){ terraRT.startBluetoothScan(type: .BLE, callback: {success in
                 showingWidget.toggle()
-                print(success)
+                print("Device Connection Callback: \(success)")
             })}
             Toggle(isOn: $bleSwitch, label: {
                 Text("Real Time").fontWeight(.bold)
@@ -167,15 +281,74 @@ struct ContentView: View {
                     .padding([.top, .bottom], Globals.shared.smallpadding)
                     .padding([.trailing])
             }).onChange(of: bleSwitch){bleSwitch in
+                let userId = terraRT.getUserid()
+                print("UserId detected: \(userId ?? "None")")
                 if (bleSwitch){
-                    terraRT.startRealtime(type: .BLE, token:generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId:USERID )!.token, dataType: Set([.STEPS, .HEART_RATE]))
+                    print("startRealtime - BLE")
+                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .CORE_TEMPERATURE]),
+                        callback: { update in
+                            print(update)
+                            print("hello")
+                        }
+                    )
+//                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .CORE_TEMPERATURE]), token: generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId:"51273153-67d9-4fb8-a60d-858fc066eb64")!.token,
+//                        callback: { update in
+//                            print(update)
+//                            print("hello")
+//                        }
+//                    )
                 }
                 else {
                     terraRT.stopRealtime(type: .BLE)
                 }
             }
         }
-
+    }
+    
+    private func watchConnection() -> some View{
+        HStack{
+            Button(action: {
+                print("WatchOS selected!")
+                
+            }, label: {
+                    Text("Apple Watch")
+                    .fontWeight(.bold)
+                    .font(.system(size: 14))
+                    .foregroundColor(.inverse)
+                    .padding([.top, .bottom], Globals.shared.smallpadding)
+                    .padding([.leading, .trailing])
+                    .background(
+                        Capsule()
+                            .foregroundColor(.button)
+                    )
+            })
+//            .sheet(isPresented: $showingWidget){ terraRT.startBluetoothScan(type: .BLE, callback: {success in
+//                showingWidget.toggle()
+//                print("Device Connection Callback: \(success)")
+//            })}
+//            Toggle(isOn: $bleSwitch, label: {
+//                Text("Real Time").fontWeight(.bold)
+//                    .font(.system(size: 14))
+//                    .foregroundColor(.inverse)
+//                    .padding([.top, .bottom], Globals.shared.smallpadding)
+//                    .padding([.trailing])
+//            }).onChange(of: bleSwitch){bleSwitch in
+//                let userId = terraRT.getUserid()
+//                print("UserId detected: \(userId ?? "None")")
+//                if (bleSwitch){
+//                    print("startRealtime - WatchOS")
+//                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .CORE_TEMPERATURE]),
+//                        callback: { update in
+//                            print(update)
+//                            print("hello")
+//                        }
+//                    )
+//                }
+//                else {
+//                    terraRT.stopRealtime(type: .BLE)
+//                }
+//            }
+        }
     }
 }
 
