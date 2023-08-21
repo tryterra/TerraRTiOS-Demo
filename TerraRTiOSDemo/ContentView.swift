@@ -14,7 +14,6 @@ public struct TokenPayload: Decodable{
 }
 
 public func generateToken(devId: String, xAPIKey: String, userId: String) -> TokenPayload?{
-    
         let url = URL(string: "https://ws.tryterra.co/auth/user?id=\(userId)")
         
         guard let requestUrl = url else {fatalError()}
@@ -111,6 +110,7 @@ extension Color {
 }
 
 struct ContentView: View {
+    @State private var heartRate = 0.0
     
     let terraRT = TerraRT(devId: DEVID, referenceId: "user2") { succ in
         print("TerraRT init: \(succ)")
@@ -162,6 +162,15 @@ struct ContentView: View {
                             .stroke(Color.border, lineWidth: 1)
                             .padding([.leading, .trailing], 5)
                         )
+                startStreamingWatch().padding([.leading, .trailing, .top, .bottom])
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Globals.shared.cornerradius)
+                            .stroke(Color.border, lineWidth: 1)
+                            .padding([.leading, .trailing], 5)
+                        )
+                Text("\(heartRate) bpm") // Display static text
+                    .font(.title)
+                    .padding()
                 Spacer()
             }
             .navigationTitle(Text("Terra RealTime iOS")).padding(.top, 40)
@@ -201,6 +210,7 @@ struct ContentView: View {
                     } else {
                         print("getConnectedDevice: none found")
                     }
+                    
                     
 //                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .ACCELERATION, .CALORIES, .HRV])) { update in
 //                        print(update)
@@ -282,13 +292,16 @@ struct ContentView: View {
                     .padding([.trailing])
             }).onChange(of: bleSwitch){bleSwitch in
                 let userId = terraRT.getUserid()
+                let token = generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId: userId!)!.token
                 print("UserId detected: \(userId ?? "None")")
                 if (bleSwitch){
                     print("startRealtime - BLE")
-                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .CORE_TEMPERATURE]),
+                    terraRT.startRealtime(
+                        type: Connections.BLE,
+                        dataType: Set([.STEPS, .HEART_RATE, .CORE_TEMPERATURE]),
+                        token: token,
                         callback: { update in
                             print(update)
-                            print("hello")
                         }
                     )
 //                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .CORE_TEMPERATURE]), token: generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId:"51273153-67d9-4fb8-a60d-858fc066eb64")!.token,
@@ -305,11 +318,78 @@ struct ContentView: View {
         }
     }
     
+    private func startStreamingWatch() -> some View{
+        HStack{
+            Button(action: {
+                print("Starting stream!")
+                terraRT.startRealtime(
+                    type: Connections.WATCH_OS,
+                    dataType: Set([.HEART_RATE]),
+//                            token: stToken?.token ?? "",
+                    callback: { update in
+                        heartRate = update.val ?? -1.0
+                        print("Watch: \(update)")
+                    }
+                )
+//                do {
+//                    let userId = terraRT.getUserid()
+////                    let stToken = generateToken(devId: DEVID, xAPIKey: XAPIKEY, userId: userId!)
+//                    terraRT.startRealtime(
+//                        type: Connections.WATCH_OS,
+//                        dataType: Set([.HEART_RATE]),
+////                            token: stToken?.token ?? "",
+//                        callback: { update in
+//                            heartRate = update.val ?? -1.0
+//                            print("Watch: \(update)")
+//                        })
+//                    if let token {
+//                        terraRT.startRealtime(
+//                            type: Connections.WATCH_OS,
+//                            dataType: Set([.HEART_RATE]),
+////                            token: stToken?.token ?? "",
+//                            callback: { update in
+//                                heartRate = update.val ?? -1.0
+//                                print("Watch: \(update)")
+//                            })
+//                    } else {
+//                        print("Could not get token or uid")
+////                        print("token: \(stToken)")
+//                        print("uid: \(userId)")
+//                    }
+//                } catch {
+//                    // Handle other unexpected errors
+//                    print("An error occurred while streaming: \(error)")
+//                }
+                
+            }, label: {
+                Text("Start Stream")
+                    .fontWeight(.bold)
+                    .font(.system(size: 14))
+                    .foregroundColor(.inverse)
+                    .padding([.top, .bottom], Globals.shared.smallpadding)
+                    .padding([.leading, .trailing])
+                    .background(
+                        Capsule()
+                            .foregroundColor(.button)
+                    )
+            })
+        }
+    }
     private func watchConnection() -> some View{
         HStack{
             Button(action: {
-                print("WatchOS selected!")
-                
+                print("Connecting to Apple Watch!")
+                do {
+                    try terraRT.connectWithWatchOS()
+                    // Function ran successfully, continue with your code here
+                    print("Connection Success")
+                } catch TerraError.FeatureNotSupported {
+                    // Handle the case where watch connectivity is not supported
+                    print("Watch connectivity is not supported on this device.")
+                } catch {
+                    // Handle other unexpected errors
+                    print("An error occurred: \(error)")
+                }
             }, label: {
                     Text("Apple Watch")
                     .fontWeight(.bold)

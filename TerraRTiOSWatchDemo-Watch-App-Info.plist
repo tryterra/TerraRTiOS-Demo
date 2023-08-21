@@ -8,5 +8,7 @@
 	<array>
 		<string>workout-processing</string>
 	</array>
+	<key>motion usage</key>
+	<string></string>
 </dict>
 </plist>

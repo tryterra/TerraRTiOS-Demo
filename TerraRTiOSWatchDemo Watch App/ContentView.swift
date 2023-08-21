@@ -47,51 +47,67 @@ struct ContentView: View {
                         .stroke(Color.border, lineWidth: 1)
                         .padding([.leading, .trailing], 5)
                     )
+            startStreamButton().padding([.leading, .trailing, .top, .bottom])
+                .overlay(
+                    RoundedRectangle(cornerRadius: Globals.shared.cornerradius)
+                        .stroke(Color.border, lineWidth: 1)
+                        .padding([.leading, .trailing], 5)
+                    )
         }
         .padding()
     }
     
+    @State private var terra : Terra?
+    
     private func watchConnection() -> some View{
         HStack{
             Button(action: {
-                print("WatchOS selected!")
-                let terra: Terra? = try? Terra()
+                print("Initalised Terra!")
+                self.terra = try? Terra()
                 guard let terra else {
                     print("Error initialising Terra")
                     return
                 }
             }, label: {
-                Text("Apple Watch")
+                Text("Setup Terra")
             })
-            //            .sheet(isPresented: $showingWidget){ terraRT.startBluetoothScan(type: .BLE, callback: {success in
-            //                showingWidget.toggle()
-            //                print("Device Connection Callback: \(success)")
-            //            })}
-            //            Toggle(isOn: $bleSwitch, label: {
-            //                Text("Real Time").fontWeight(.bold)
-            //                    .font(.system(size: 14))
-            //                    .foregroundColor(.inverse)
-            //                    .padding([.top, .bottom], Globals.shared.smallpadding)
-            //                    .padding([.trailing])
-            //            }).onChange(of: bleSwitch){bleSwitch in
-            //                let userId = terraRT.getUserid()
-            //                print("UserId detected: \(userId ?? "None")")
-            //                if (bleSwitch){
-            //                    print("startRealtime - WatchOS")
-            //                    terraRT.startRealtime(type: Connections.BLE, dataType: Set([.STEPS, .HEART_RATE, .CORE_TEMPERATURE]),
-            //                        callback: { update in
-            //                            print(update)
-            //                            print("hello")
-            //                        }
-            //                    )
-            //                }
-            //                else {
-            //                    terraRT.stopRealtime(type: .BLE)
-            //                }
-            //            }
-            
         }
     }
+    
+    private func startStreamButton() -> some View{
+        HStack{
+            Button(action: {
+                print("Start streaming")
+                guard let t = self.terra else {
+                    print("Terra not initialised")
+                    return
+                }
+                self.terra?.startStream(forDataTypes: Set([.STEPS, .HEART_RATE])){ update in
+                    print("device: \(update)")
+                }
+            }, label: {
+                Text("Start streaming")
+            })
+        }
+    }
+    
+//    private func startStreamButton() -> some View{
+//        HStack{
+//            Button(action: {
+//                print("WatchOS selected!")
+//                let terra: Terra? = try? Terra()
+//                guard let terra else {
+//                    print("Error initialising Terra")
+//                    return
+//                }
+//                terra.startStream(forDataTypes: Set([.STEPS, .HEART_RATE])){ update in
+//                    print("device: \(update)")
+//                }
+//            }, label: {
+//                Text("Start Stream")
+//            })
+//        }
+//    }
 }
 
 struct ContentView_Previews: PreviewProvider {

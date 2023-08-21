@@ -52,6 +52,8 @@
 		9B4D7E8528804D73001EA126 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9B4D7E8828804D73001EA126 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		9B4D7E9228804DDC001EA126 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		DD1E747C2A8E7826001DD6F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		DD1E747D2A8E7834001DD6F7 /* TerraRTiOSDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TerraRTiOSDemo.entitlements; sourceTree = "<group>"; };
 		DD33EB162A4A6C82003B8743 /* TerraRTiOS-dev */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "TerraRTiOS-dev"; path = "../TerraRTiOS-dev"; sourceTree = "<group>"; };
 		DD63A6A52A8A70C60087EBF5 /* TerraRTiOSWatchDemo Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TerraRTiOSWatchDemo Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD63A6A72A8A70C60087EBF5 /* TerraRTiOSWatchDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerraRTiOSWatchDemoApp.swift; sourceTree = "<group>"; };
@@ -105,6 +107,8 @@
 		9B4D7E8028804D71001EA126 /* TerraRTiOSDemo */ = {
 			isa = PBXGroup;
 			children = (
+				DD1E747D2A8E7834001DD6F7 /* TerraRTiOSDemo.entitlements */,
+				DD1E747C2A8E7826001DD6F7 /* Info.plist */,
 				9B4D7E8128804D71001EA126 /* TerraRTiOSDemoApp.swift */,
 				9B4D7E8328804D71001EA126 /* ContentView.swift */,
 				9B4D7E8528804D73001EA126 /* Assets.xcassets */,
@@ -414,12 +418,14 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TerraRTiOSDemo/TerraRTiOSDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TerraRTiOSDemo/Preview Content\"";
 				DEVELOPMENT_TEAM = 8HP4B6QYR7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TerraRTiOSDemo/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Provide user with ability to connect to BLE devices";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Need health data to connect";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Need health data to connect";
@@ -449,12 +455,14 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TerraRTiOSDemo/TerraRTiOSDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TerraRTiOSDemo/Preview Content\"";
 				DEVELOPMENT_TEAM = 8HP4B6QYR7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TerraRTiOSDemo/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Provide user with ability to connect to BLE devices";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Need health data to connect";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Need health data to connect";
@@ -493,6 +501,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TerraRTiOSWatchDemo-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TerraRTiOSWatchDemo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Need you health data for streaming";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Need you health data for streaming";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Need you health data for streaming";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Need you health data for streaming";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = co.tryterra.terra.TerraRTiOSDemo;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -526,6 +539,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TerraRTiOSWatchDemo-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TerraRTiOSWatchDemo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Need you health data for streaming";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Need you health data for streaming";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Need you health data for streaming";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Need you health data for streaming";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = co.tryterra.terra.TerraRTiOSDemo;
 				LD_RUNPATH_SEARCH_PATHS = (
